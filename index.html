@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Deploying and Evaluating Robotics Foundation Models: Zero-Shot & Lessons
+      Learned
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./static/css/bulma.min.css" />
+    <link rel="stylesheet" href="./static/css/index.css" />
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <section class="hero is-small">
+      <div class="hero-body">
+        <div class="container has-text-centered">
+          <h1 class="title is-1">
+            Deploying & Evaluating Robotics Foundation Models:<br />Zero-Shot
+            and Lessons Learned
+          </h1>
+          <p class="is-size-5">Min Aung Paing, USC SLURM Lab</p>
+          <p class="is-size-6">
+            <a href="https://github.com/openvla/openvla">OpenVLA Repository</a>
+            |
+            <a href="https://github.com/google-research/open-x-embodiment"
+              >Open-X Dataset</a
+            >
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Takeaways -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="box">
+          <h2 class="title is-4">Key Takeaways</h2>
+          <ul>
+            <li>
+              Zero-shot OpenVLA generated semantically correct motions, even on
+              unseen robots.
+            </li>
+            <li>
+              Performance heavily depended on camera viewpoint and workspace
+              similarity.
+            </li>
+            <li>
+              Multi-step tasks (e.g., grasp + place) remained challenging
+              without fine-tuning.
+            </li>
+            <li>
+              Fine-tuning and viewpoint adaptation are essential for reliable
+              deployment.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Intro -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="content has-text-justified">
+          <p>
+            <strong>OpenVLA</strong> is an open-source 7B parameter
+            vision-language-action (VLA) model trained on 970k robot episodes
+            from the
+            <a href="https://github.com/google-research/open-x-embodiment"
+              >Open-X Embodiment dataset</a
+            >. It takes a single RGB image and a natural language instruction
+            and outputs high-level robot actions (end-effector pose deltas +
+            gripper command), represented as discrete tokens predicted
+            autoregressively.
+          </p>
+          <p>
+            Our goal was simple:
+            <em
+              >“Can we deploy OpenVLA on our xArm7 robot, zero-shot, and have it
+              perform real tasks?”</em
+            >
+            The catch: we wanted to do this without any fine-tuning and see what
+            breaks.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Physical Setup -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">1. Physical Setup & Why It Matters</h2>
+        <p>
+          Our setup used an <strong>xArm7</strong> robotic arm with a static
+          third-person camera. Tasks included reaching for colored cubes and
+          following simple instructions like “pick up red cylinder”.
+        </p>
+        <p>
+          One key insight from our zero-shot deployment experiments was that
+          <strong
+            >OpenVLA only produced meaningful motions when our physical setup
+            closely matched one of the training environments</strong
+          >.
+        </p>
+        <p>
+          Initially, we tried different camera angles and workspace layouts
+          while using the original normalization statistics from OpenVLA’s
+          training dataset. Despite correct prompts, the robot often produced
+          random movements or froze mid-task.
+        </p>
+        <p>
+          After analyzing the training dataset, we replicated one scene as
+          closely as possible:
+        </p>
+        <ul>
+          <li><strong>Camera Viewpoint:</strong> Matching angle and height</li>
+          <li>
+            <strong>Table Color:</strong> Similar surface tone reduced
+            background confusion
+          </li>
+          <li>
+            <strong>Background:</strong> Removed clutter and used a clean
+            backdrop similar to training
+          </li>
+          <li>
+            <strong>Object Placement:</strong> Layout resembling training
+            dataset scenes
+          </li>
+        </ul>
+        <p>
+          <strong>Result:</strong> After matching these characteristics, OpenVLA
+          generated semantically correct motions (e.g., reaching toward the
+          correct object and attempting grasping). This highlights how
+          <strong
+            >foundation models are sensitive to camera angle, background, and
+            scene composition</strong
+          >, and why environment matching is crucial for zero-shot deployment.
+        </p>
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets/unmatched_env.jpg" alt="Mismatched Setup" />
+            </figure>
+            <p class="has-text-centered is-size-6">
+              Mismatched setup → random motions
+            </p>
+          </div>
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets/matched_setup.jpg" alt="Matched Setup" />
+            </figure>
+            <p class="has-text-centered is-size-6">
+              Matched training dataset → meaningful motions
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simulation Results -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">2. Simulation Results</h2>
+        <p>
+          We tested simulation tasks from the LIBERO benchmark, like “put
+          ketchup bottle in basket”. Even without fine-tuning, OpenVLA
+          understood semantics and generated reasonable motions:
+        </p>
+        <ul>
+          <li>Approached target objects reliably.</li>
+          <li>
+            Multi-step sequences (grasp + transport + place) often failed
+            mid-way.
+          </li>
+          <br />
+        </ul>
+
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <video autoplay muted loop playsinline width="100%">
+              <source
+                src="assets/episode_00_failure_pick_up_the_tomato_sauce_and_place_it_in_the_baske (1).mp4"
+                type="video/mp4"
+              />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              Example: “Put ketchup bottle in basket” → grasp succeeded,
+              placement failed
+            </p>
+          </div>
+        </div>
+        <p>
+          <strong>Insight:</strong> Even in sim, zero-shot models show semantic
+          grounding but lack fine motor reliability.
+        </p>
+      </div>
+    </section>
+
+    <!-- Physical Deployment -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">3. Physical Deployment on xArm7</h2>
+        <p>Zero-shot deployment produced mixed results:</p>
+        <div class="columns is-multiline">
+          <div class="column is-half">
+            <video autoplay muted loop playsinline width="100%">
+              <source src="static/videos/gray_cube.mp4" type="video/mp4" />
+            </video>
+            <p class="is-size-6 has-text-centered">Task: "Pick up gray cube"</p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline width="100%">
+              <source src="static/videos/red_cylinder.mp4" type="video/mp4" />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              Task: "Pick up red cylinder" → grabbed orange cube (mismatch)
+            </p>
+          </div>
+        </div>
+        <figure class="image">
+          <img
+            src="static/images/success_rate_chart.png"
+            alt="Task vs Success Rate"
+          />
+        </figure>
+        <p class="is-size-6 has-text-centered">
+          Task vs Success Rate (zero-shot) – success is task-dependent and
+          viewpoint-sensitive.
+        </p>
+        <p>
+          <strong>Insight:</strong> Matching camera and background to training
+          dataset improved success rates.
+        </p>
+      </div>
+    </section>
+
+    <!-- Lessons Learned -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">4. Failure Modes</h2>
+        <p>
+          While OpenVLA produced meaningful motions in certain tasks, we
+          observed several failure modes during zero-shot deployment:
+        </p>
+        <div class="columns is-multiline">
+          <!-- Failure 1 -->
+          <div class="column is-one-third">
+            <video autoplay muted loop playsinline width="100%">
+              <source
+                src="static/videos/failure_wrong_object.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              <strong>Wrong Object Selection:</strong> Prompted to “pick up red
+              cylinder” but grasped an orange cube.
+            </p>
+          </div>
+
+          <!-- Failure 2 -->
+          <div class="column is-one-third">
+            <video autoplay muted loop playsinline width="100%">
+              <source src="static/videos/failure_freeze.mp4" type="video/mp4" />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              <strong>Policy Freeze:</strong> Robot moved partially, then
+              stopped mid-task with no recovery behavior.
+            </p>
+          </div>
+
+          <!-- Failure 3 -->
+          <div class="column is-one-third">
+            <video autoplay muted loop playsinline width="100%">
+              <source src="static/videos/failure_drop.mp4" type="video/mp4" />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              <strong>Grasp Instability:</strong> Successfully grasped object
+              but dropped it before completing placement.
+            </p>
+          </div>
+        </div>
+        <p>
+          These failure cases often stemmed from
+          <strong>viewpoint sensitivity</strong>,
+          <strong>action token discretization errors</strong>, and the absence
+          of closed-loop feedback in zero-shot mode. Addressing these would
+          likely require fine-tuning or additional sensory inputs.
+        </p>
+      </div>
+    </section>
+
+    <!-- Challenges -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">5. Challenges & Observations</h2>
+        <ol>
+          <li>
+            <strong>Environment Sensitivity:</strong> Even small camera shifts
+            degraded performance.
+          </li>
+          <li>
+            <strong>Normalization Mismatch:</strong> Original dataset
+            normalization caused drift; recomputed stats improved stability.
+          </li>
+          <li>
+            <strong>Multi-Step Tasks:</strong> Struggled with grasp + placement
+            despite semantic understanding.
+          </li>
+        </ol>
+        <ul>
+          <li>Prompt phrasing affected motion behavior.</li>
+          <li>Human presence did not break policies (good robustness).</li>
+        </ul>
+        <p>
+          <strong>Insight:</strong> OpenVLA has strong semantic priors but
+          limited control generalization.
+        </p>
+      </div>
+    </section>
+
+    <!-- Future Work -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">5. Future Work</h2>
+        <ul>
+          <li>
+            Parameter-efficient fine-tuning (e.g., LoRA) with real xArm7 demos
+            to improve precision.
+          </li>
+          <li>Expand tasks to multi-step manipulations and dynamic scenes.</li>
+          <li>Benchmark other models (π0-FAST, RT-2) for comparison.</li>
+          <li>
+            Investigate viewpoint adaptation and closed-loop control to reduce
+            environment sensitivity.
+          </li>
+        </ul>
+        <p>
+          <strong>Insight:</strong> Zero-shot deployment is valuable for rapid
+          prototyping, but reliable use requires environment adaptation or
+          fine-tuning.
+        </p>
+      </div>
+    </section>
+
+    <!-- Conclusion -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">6. Conclusion</h2>
+        <p>
+          OpenVLA shows promise as a generalist, open-source robotic policy.
+          Zero-shot, it can generate semantically aligned motions and even
+          succeed at simple reaching tasks. However, precise manipulation and
+          multi-step tasks still require environment matching or fine-tuning.
+        </p>
+        <p>
+          As robotic foundation models mature, bridging the gap between semantic
+          understanding and physical reliability will be key. Our next steps:
+          fine-tune OpenVLA for xArm7 and test whether small datasets can unlock
+          robust generalization.
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          Built using the
+          <a href="https://github.com/nerfies/nerfies.github.io"
+            >Nerfies template</a
+          >. Content © 2025 Min, USC SLURM Lab.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
