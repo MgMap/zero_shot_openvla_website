@@ -97,7 +97,7 @@
         <p>
           Our setup used an <strong>xArm7</strong> robotic arm with a static
           third-person camera. Tasks included reaching for colored cubes and
-          following simple instructions like “pick up red cylinder”.
+          following simple instructions like "pick up red cylinder".
         </p>
         <p>
           One key insight from our zero-shot deployment experiments was that
@@ -106,15 +106,52 @@
             closely matched one of the training environments</strong
           >.
         </p>
+        
         <p>
           Initially, we tried different camera angles and workspace layouts
-          while using the original normalization statistics from OpenVLA’s
+          while using the original normalization statistics from OpenVLA's
           training dataset. Despite correct prompts, the robot often produced
           random movements or froze mid-task.
         </p>
+        <br />
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets/unmatched_env.jpg" alt="Mismatched Setup" style="width: 100%; height: 400px; object-fit: cover;" />
+            </figure>
+           
+          </div>
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets/unmatched_env2.jpg" alt="Mismatched Setup" style="width: 100%; height: 400px; object-fit: cover;" />
+            </figure>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline style="width: 100%; height: 400px; object-fit: cover;">
+              <source src="assets/random_movements.mov" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+        <p class="has-text-centered is-size-6"> Our initial setup using different camera angles and workspace layouts led to random motions.</p>
+        <br />
+        
         <p>
-          After analyzing the training dataset, we replicated one scene as
-          closely as possible:
+          After analyzing the training dataset, we found a scene to replicate. Here's the training environment we aimed to match:
+        </p>
+
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets\an_environment_from_openx.jpg" alt="Training Environment Reference" style="width: 100%; height: 400px; object-fit: cover;" />
+            </figure>
+            <p class="has-text-centered is-size-6">
+              Target training environment from Open-X dataset
+            </p>
+          </div>
+        </div>
+
+        <p>
+          We then replicated this scene as closely as possible, matching:
         </p>
         <ul>
           <li><strong>Camera Viewpoint:</strong> Matching angle and height</li>
@@ -131,6 +168,19 @@
             dataset scenes
           </li>
         </ul>
+        <br />
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <figure class="image">
+              <img src="assets/matched_setup.jpg" alt="Matched Setup" style="width: 100%; height: 400px; object-fit: cover;" />
+            </figure>
+            <p class="has-text-centered is-size-6">
+              Our matched setup → meaningful motions
+            </p>
+          </div>
+        </div>
+        <br />
+
         <p>
           <strong>Result:</strong> After matching these characteristics, OpenVLA
           generated semantically correct motions (e.g., reaching toward the
@@ -140,23 +190,12 @@
             scene composition</strong
           >, and why environment matching is crucial for zero-shot deployment.
         </p>
+
         <div class="columns is-centered">
           <div class="column is-half">
-            <figure class="image">
-              <img src="assets/unmatched_env.jpg" alt="Mismatched Setup" />
-            </figure>
-            <p class="has-text-centered is-size-6">
-              Mismatched setup → random motions
-            </p>
-          </div>
-          <div class="column is-half">
-            <figure class="image">
-              <img src="assets/matched_setup.jpg" alt="Matched Setup" />
-            </figure>
-            <p class="has-text-centered is-size-6">
-              Matched training dataset → meaningful motions
-            </p>
-          </div>
+            <img src="assets/reach_orange_cube.gif" alt="Robot following orange cube" width="100%" />
+            <p class="is-size-6 has-text-centered">Task: "reach orange cube" → successfully follows orange cube</p>
+          </div>     
         </div>
       </div>
     </section>
@@ -183,13 +222,13 @@
           <div class="column is-half">
             <video autoplay muted loop playsinline width="100%">
               <source
-                src="assets/episode_00_failure_pick_up_the_tomato_sauce_and_place_it_in_the_baske (1).mp4"
+                src="assets/2025_06_25-19_30_27--episode=42--success=False--task=pick_up_the_ketchup_and_place_it_in_the_basket.mp4"
                 type="video/mp4"
               />
             </video>
             <p class="is-size-6 has-text-centered">
               Example: “Put ketchup bottle in basket” → grasp succeeded,
-              placement failed
+              placement succeeded
             </p>
           </div>
         </div>
@@ -221,17 +260,28 @@
             </p>
           </div>
         </div>
-        <figure class="image">
+        <br />
+
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <img src="assets/follow_ketch_up.gif" alt="Robot following ketchup bottle" width="100%" />
+            <p class="is-size-6 has-text-centered"> Task: "reach the ketchup bottle" → follows ketchup bottle</p>
+          </div>     
+        </div>
+        <br />
+        </div>
+        <figure class="image" style="max-width: 600px; margin: 0 auto;">
           <img
-            src="static/images/success_rate_chart.png"
+            src="assets/openvla_physical_testing.png"
             alt="Task vs Success Rate"
+            style="width: 100%; height: auto;"
           />
         </figure>
         <p class="is-size-6 has-text-centered">
           Task vs Success Rate (zero-shot) – success is task-dependent and
           viewpoint-sensitive.
         </p>
-        <p>
+        <p class="is-size-6 has-text-centered">
           <strong>Insight:</strong> Matching camera and background to training
           dataset improved success rates.
         </p>
@@ -371,7 +421,7 @@
           Built using the
           <a href="https://github.com/nerfies/nerfies.github.io"
             >Nerfies template</a
-          >. Content © 2025 Min, USC SLURM Lab.
+          >. Content © 2025 Min Aung Paing, USC SLURM Lab.
         </p>
       </div>
     </footer>
