@@ -138,7 +138,7 @@
         <p>
           After analyzing the training dataset, we found a scene to replicate. Here's the training environment we aimed to match:
         </p>
-
+        <br />
         <div class="columns is-centered">
           <div class="column is-half">
             <figure class="image">
@@ -231,6 +231,18 @@
               placement succeeded
             </p>
           </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline width="100%">
+              <source
+                src="assets/episode_00_failure_pick_up_the_tomato_sauce_and_place_it_in_the_basket.mp4"
+                type="video/mp4"
+              />
+            </video>
+            <p class="is-size-6 has-text-centered">
+              Example: “Put tomato sauce bottle in basket” → grasp succeeded,
+              placement failed (robot did not move to basket)
+            </p>
+          </div>
         </div>
         <p>
           <strong>Insight:</strong> Even in sim, zero-shot models show semantic
@@ -299,12 +311,12 @@
         <div class="columns is-multiline">
           <!-- Failure 1 -->
           <div class="column is-one-third">
-            <video autoplay muted loop playsinline width="100%">
-              <source
-                src="static/videos/failure_wrong_object.mp4"
-                type="video/mp4"
+        <figure class="image" style="max-width: 600px; margin: 0 auto;">
+              <img
+                src="assets/failure_pick_up_blue.gif"
+                alt="Wrong Object Selection"
               />
-            </video>
+            </figure>
             <p class="is-size-6 has-text-centered">
               <strong>Wrong Object Selection:</strong> Prompted to “pick up red
               cylinder” but grasped an orange cube.
@@ -313,10 +325,11 @@
 
           <!-- Failure 2 -->
           <div class="column is-one-third">
-            <video autoplay muted loop playsinline width="100%">
-              <source src="static/videos/failure_freeze.mp4" type="video/mp4" />
-            </video>
+            <figure class="image" style="max-width: 600px; margin: 0 auto;">
+              <img src="assets/pick_up_ketchup_stuck.gif" alt="Policy Freeze" />
+            </figure>
             <p class="is-size-6 has-text-centered">
+
               <strong>Policy Freeze:</strong> Robot moved partially, then
               stopped mid-task with no recovery behavior.
             </p>
@@ -324,20 +337,18 @@
 
           <!-- Failure 3 -->
           <div class="column is-one-third">
-            <video autoplay muted loop playsinline width="100%">
-              <source src="static/videos/failure_drop.mp4" type="video/mp4" />
-            </video>
+            <figure class="image" style="max-width: 600px; margin: 0 auto;">
+              <img src="assets/failure_pick_up_gray.gif" alt="Unreliable Motor Control" />
+            </figure>
             <p class="is-size-6 has-text-centered">
-              <strong>Grasp Instability:</strong> Successfully grasped object
-              but dropped it before completing placement.
+              <strong>Unreliable Motor Control:</strong> Prompted to "Grasp gray cube" but grasped the area aroundthe gray cube
             </p>
           </div>
         </div>
         <p>
           These failure cases often stemmed from
-          <strong>viewpoint sensitivity</strong>,
-          <strong>action token discretization errors</strong>, and the absence
-          of closed-loop feedback in zero-shot mode. Addressing these would
+          <strong>viewpoint sensitivity, environment factors, and normalization statistics from the training dataset</strong>.
+          Addressing these would
           likely require fine-tuning or additional sensory inputs.
         </p>
       </div>
@@ -365,10 +376,7 @@
           <li>Prompt phrasing affected motion behavior.</li>
           <li>Human presence did not break policies (good robustness).</li>
         </ul>
-        <p>
-          <strong>Insight:</strong> OpenVLA has strong semantic priors but
-          limited control generalization.
-        </p>
+       
       </div>
     </section>
 
@@ -388,11 +396,7 @@
             environment sensitivity.
           </li>
         </ul>
-        <p>
-          <strong>Insight:</strong> Zero-shot deployment is valuable for rapid
-          prototyping, but reliable use requires environment adaptation or
-          fine-tuning.
-        </p>
+       
       </div>
     </section>
 
