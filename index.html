@@ -35,7 +35,7 @@
       </div>
     </section>
 
-    <!-- Key Takeaways -->
+    <!-- Key Takeaways
     <section class="section">
       <div class="container is-max-desktop">
         <div class="box">
@@ -60,7 +60,7 @@
           </ul>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Intro -->
     <section class="section">
@@ -258,17 +258,24 @@
         <p>Zero-shot deployment produced mixed results:</p>
         <div class="columns is-multiline">
           <div class="column is-half">
-            <video autoplay muted loop playsinline width="100%">
-              <source src="static/videos/gray_cube.mp4" type="video/mp4" />
-            </video>
+           <figure class="image" style="max-width: 600px; margin: 0 auto;">
+          <img
+            src="assets/PICK_UP_GRAY_SUCCESS.gif"
+            alt="Pick up gray cube success"
+            style="width: 100%; height: auto;"
+          />
+        </figure>
             <p class="is-size-6 has-text-centered">Task: "Pick up gray cube"</p>
           </div>
           <div class="column is-half">
-            <video autoplay muted loop playsinline width="100%">
-              <source src="static/videos/red_cylinder.mp4" type="video/mp4" />
-            </video>
+           <figure class="image" style="max-width: 600px; margin: 0 auto;">
+          <img
+            src="assets/pick_up_red_cylinder_fail.gif"
+            alt="Pick up red cylinder fail"
+            style="width: 100%; height: auto;"
+          />
             <p class="is-size-6 has-text-centered">
-              Task: "Pick up red cylinder" → grabbed orange cube (mismatch)
+              Task: "Pick up red cylinder" → did not produce meaningful motion
             </p>
           </div>
         </div>
@@ -318,8 +325,7 @@
               />
             </figure>
             <p class="is-size-6 has-text-centered">
-              <strong>Wrong Object Selection:</strong> Prompted to “pick up red
-              cylinder” but grasped an orange cube.
+              <strong>Wrong Object Selection:</strong> Prompted to “pick up blue cube” but grasped an orange cube.
             </p>
           </div>
 
@@ -374,7 +380,6 @@
         </ol>
         <ul>
           <li>Prompt phrasing affected motion behavior.</li>
-          <li>Human presence did not break policies (good robustness).</li>
         </ul>
        
       </div>
@@ -393,6 +398,31 @@
           <li>Benchmark other models (π0-FAST, RT-2) for comparison.</li>
         </ul>
        
+      </div>
+    </section>
+
+    <!-- Resources & Reproducibility -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">Resources & Reproducibility</h2>
+        <p>
+          To help others reproduce our work and understand the technical details, we've made our code and documentation available:
+        </p>
+        
+        <div class="box">
+          <h3 class="title is-5">Technical Documentation</h3>
+          <ul>
+            <li>
+              <strong><a href="https://www.notion.so/Zero-Shot-Deploying-OpenVLA-on-xArm7-2420c283ec948058a9c7fb59758ed809?source=copy_link">OpenVLA ZeroShot Deployment Documentation</a></strong> - Detailed steps to replicate our physical setup and deployment process
+            </li>
+            <li>
+              <strong><a href="https://www.notion.so/Normstats-2420c283ec948068b632e5eebc2ab4e6?source=copy_link">Normalization Statistics Analysis</a></strong> - Step-by-step guide calculating new normalization stats from Open-X dataset
+            </li>
+            <li>
+              <strong><a href="https://docs.google.com/spreadsheets/d/1mIWzYEUU-vgEAqKjEfaZCHzYRWKgj7kr7vWv_zixGl0/edit?gid=0#gid=0">Experiments Tracking</a></strong> - Spreadsheet tracking prompts, and outcomes
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
